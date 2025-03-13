@@ -17,27 +17,6 @@ interface EIP6963ProviderDetail {
   provider: any; // EIP-1193 호환 제공자
 }
 
-// // testnet (value = chainid)
-// const SUPPORTED_CHAINS = [
-//   {value: "0x2f", label: "XPLA"},
-//   {value: "0xaa36a7", label: "ETHEREUM"},
-//   {value: "0x61", label: "BNB"}
-// ]
-
-// mainnet
-// const SUPPORTED_CHAINS = [
-//   {value: "0x25", label: "XPLA"},
-//   {value: "0x1", label: "ETHEREUM"},
-//   {value: "0x38", label: "BNB"}
-// ]
-
-// testnet (value = chainid)
-const SUPPORTED_CHAINS = [
-  { value: "0x2f", label: "XPLA" },
-  { value: "0xaa36a7", label: "ETHEREUM" },
-  { value: "0x61", label: "BNB" }
-]
-
 type lzChain = {
   name: string,
   eid: string,
@@ -45,6 +24,25 @@ type lzChain = {
   nativeToken: string,
   contractAddress: string
 }
+
+// mainnet
+// const SUPPORTED_CHAINS = [
+//   {value: "0x25", label: "XPLA"},
+//   {value: "0x1", label: "ETHEREUM"},
+//   {value: "0x38", label: "BNB"}
+// ]
+// const chainList = new Map<string, lzChain>()
+// chainList.set("0x25", { name: "XPLA", eid: "30216", chainId: "0x25", nativeToken: "XPLA", contractAddress: "" })
+// chainList.set("0x1", { name: "ETHEREUM", eid: "30161", chainId: "0x1", nativeToken: "Eth", contractAddress: "" })
+// chainList.set("0x38", { name: "BNB", eid: "30102", chainId: "0x38", nativeToken: "BNB", contractAddress: "" })
+
+
+// testnet (value = chainid)
+const SUPPORTED_CHAINS = [
+  { value: "0x2f", label: "XPLA" },
+  { value: "0xaa36a7", label: "ETHEREUM" },
+  { value: "0x61", label: "BNB" }
+]
 
 const chainList = new Map<string, lzChain>()
 chainList.set("0x2f", { name: "XPLA", eid: "40216", chainId: "0x2f", nativeToken: "XPLA", contractAddress: "0x2Bb21C18788587cbc3b8B903F5C8eAB9c7D26988" })
@@ -66,7 +64,16 @@ function App() {
   // EIP-6963 제공자 탐지
   useEffect(() => {
     const handleAnnounceProvider = (event: CustomEvent<EIP6963ProviderDetail>) => {
-      setProviders((prev) => [...prev, event.detail]);
+      setProviders((prev) => {
+        // 이미 존재하는 UUID인지 확인
+        const isDuplicate = prev.some(
+          (provider) => provider.info.uuid === event.detail.info.uuid
+        );
+        if (isDuplicate) {
+          return prev; // 중복이면 추가하지 않음
+        }
+        return [...prev, event.detail];
+      });
     };
 
     window.addEventListener(
