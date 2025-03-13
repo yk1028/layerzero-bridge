@@ -1,7 +1,23 @@
+/* 기존 스타일 유지 */
 .App {
   min-width: 100vw;
   min-height: 100vh;
   text-align: center;
+  background-color: #f8f9fa;
+  font-family: 'Arial', sans-serif;
+  padding: 20px;
+}
+
+h1 {
+  color: #17a2b8;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
 }
 
 .providers {
@@ -11,21 +27,160 @@
   align-items: center;
   align-content: center;
   gap: 1em;
-
   padding: 0.6em 1.2em;
 }
 
 .providers button {
   width: 12em;
+  padding: 10px;
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.providers button:hover {
+  background-color: #138496;
 }
 
 .providers button img {
   width: 2em;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  padding: 8px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+input[type="text"] {
+  width: 300px;
+}
+
+input[type="number"] {
+  width: 100px;
+}
+
+select {
+  width: 150px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #138496;
+}
+
+p {
+  color: #555;
+  margin: 10px 0;
 }
 
 .mmError {
   height: 36px;
   padding: 16px;
-  color: #efefef;
+  color: #dc3545;
   background-color: transparent;
+  text-align: center;
+}
+
+#status {
+  width: 700px;
+  height: auto;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  color: #333;
+  text-align: left;
+  margin: 20px auto;
+  padding: 15px;
+  word-wrap: break-word;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1.5;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+#status a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+#status a:hover {
+  text-decoration: underline;
+}
+
+.explorer-link {
+  display: inline-block;
+  padding: 8px 12px;
+  background-color: #28a745;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.explorer-link:hover {
+  background-color: #218838;
+}
+
+.explorer-link:active {
+  background-color: #1e7e34;
+}
+
+label {
+  margin-right: 10px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Connected Account와 Balance 스타일 수정 */
+.connected-info {
+  display: flex;
+  flex-direction: column; /* 세로 배치 */
+  align-items: center; /* 중앙 정렬 */
+  gap: 10px; /* 항목 간 간격 */
+  margin: 20px 0;
+}
+
+.connected-info div {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 15px;
+  width: 550px; /* 더 넓게 조정 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  display: flex;
+  justify-content: space-between; /* 라벨과 값 사이 간격 최대화 */
+}
+
+.connected-info .label {
+  color: #17a2b8; /* 청록색 강조 */
+  font-weight: bold;
+}
+
+.connected-info .value {
+  color: #333;
+  word-break: break-all; /* 긴 주소 줄바꿈 */
 }

@@ -50,10 +50,10 @@ chainList.set("0xaa36a7", { name: "ETHEREUM", eid: "40161", chainId: "0xaa36a7",
 chainList.set("0x61", { name: "BNB", eid: "40102", chainId: "0x61", nativeToken: "BNB", contractAddress: "0x2Bb21C18788587cbc3b8B903F5C8eAB9c7D26988" })
 
 type EstimatedInfo = {
-    from: LzChain,
-    to: LzChain,
-    amount: bigint,
-    nativeFee: bigint
+  from: LzChain,
+  to: LzChain,
+  amount: bigint,
+  nativeFee: bigint
 }
 
 function App() {
@@ -65,6 +65,7 @@ function App() {
   const [recipient, setRecipient] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [txStatus, setTxStatus] = useState<string>("");
+  const [txHash, setTxHash] = useState<string>("");
   const [providers, setProviders] = useState<EIP6963ProviderDetail[]>([]);
   const [estimatedInfo, setEstimatedInfo] = useState<EstimatedInfo>();
 
@@ -132,11 +133,11 @@ function App() {
 
     try {
       const currentLzChain = chainList.get(currentChain)!
-      
+
       if (currentLzChain.name == "XPLA") {
         setBalance(ethers.formatEther(await provider.getBalance(account)))
         return
-      } 
+      }
 
       const contract = await getOftContract(currentLzChain.contractAddress, provider);
       const decimals = await contract.decimals();
@@ -160,6 +161,8 @@ function App() {
     }
 
     try {
+
+      setTxHash("")
 
       const currentLzChain = chainList.get(currentChain)!
       const targetLzChain = chainList.get(targetChain)!
@@ -187,9 +190,9 @@ function App() {
         const msgValue = estimatedNativeFee + amountToSend
 
         setTxStatus(`Estimated native fee: ${ethers.formatEther(estimatedNativeFee.toString())} ${currentLzChain.nativeToken} \nTotal (native fee + amount): ${ethers.formatEther(msgValue.toString())} ${currentLzChain.nativeToken} `)
-      
+
         // estimated 항목에 정보 추가
-        setEstimatedInfo({from: currentLzChain, to: targetLzChain, amount: amountToSend, nativeFee: estimatedNativeFee})
+        setEstimatedInfo({ from: currentLzChain, to: targetLzChain, amount: amountToSend, nativeFee: estimatedNativeFee })
       } else {
         const contract = await getOftContract(currentLzChain.contractAddress, provider)
 
@@ -199,7 +202,7 @@ function App() {
         setTxStatus(`Estimated native fee: ${ethers.formatEther(estimatedNativeFee.toString())}  ${currentLzChain.nativeToken}`)
 
         // estimated 항목에 정보 추가
-        setEstimatedInfo({from: currentLzChain, to: targetLzChain, amount: amountToSend, nativeFee: estimatedNativeFee})
+        setEstimatedInfo({ from: currentLzChain, to: targetLzChain, amount: amountToSend, nativeFee: estimatedNativeFee })
       }
     } catch (error: any) {
       console.error("Transaction failed:", error);
@@ -238,7 +241,7 @@ function App() {
       }
 
       setTxStatus(`[${currentLzChain.name}] -> [${targetLzChain.name}] Processing...`);
-      
+
       const sendParam = [
         targetLzChain.eid,
         ethers.zeroPadValue(recipient, 32),
@@ -250,24 +253,25 @@ function App() {
       ]
 
       if (currentLzChain.name == "XPLA") {
-
         const contract = await getNativeOftAdapterContract(currentLzChain.contractAddress, provider)
-
         const msgValue = estimatedInfo.nativeFee + estimatedInfo.amount
 
-        setTxStatus(`Sending XPLA OFT from ${currentLzChain.name } to ${targetLzChain.name} ... `)
+        setTxStatus(`[${currentLzChain.name}] => [${targetLzChain.name}] Sending XPLA OFT... `)
 
         const receipt = await (await contract.send(sendParam, [estimatedInfo.nativeFee, 0], recipient, { value: msgValue })).wait()
+
         setTxStatus(`Transaction successful! Tx Hash: ${receipt.hash}`);
+        setTxHash(receipt.hash)
       } else {
         const contract = await getOftContract(currentLzChain.contractAddress, provider);
-
         const nativeFee = estimatedInfo.nativeFee
 
-        setTxStatus(`Sending XPLA OFT from ${currentLzChain.name } to ${targetLzChain.name} ... `)
+        setTxStatus(`[${currentLzChain.name}] => [${targetLzChain.name}] Sending XPLA OFT... `)
 
         const receipt = await (await contract.send(sendParam, [nativeFee, 0], recipient, { value: nativeFee })).wait();
+
         setTxStatus(`Transaction successful! Tx Hash: ${receipt.hash}`);
+        setTxHash(receipt.hash)
       }
 
       setEstimatedInfo(undefined) // 초기화
@@ -278,7 +282,6 @@ function App() {
     }
   };
 
-
   // 계정 연결 시 잔액 조회
   useEffect(() => {
     if (account && provider) {
@@ -288,28 +291,40 @@ function App() {
 
   return (
     <div className="App">
-      <h1>LayerZero send OFT DApp</h1>
+      <h1>LayerZero OFT DApp</h1>
       {!account ? (
         <div>
           <h2>Available Wallets</h2>
           {providers.length === 0 ? (
-            <p>No wallets detected. Please install a compatible wallet.</p>
+            <div className="mmError">
+              No wallets detected. Please install a compatible wallet.
+            </div>
           ) : (
-            providers.map((p) => (
-              <button
-                key={p.info.uuid}
-                onClick={() => connectWallet(p.provider)}
-              >
-                <img src={p.info.icon} alt={p.info.name} width={20} />
-                {p.info.name}
-              </button>
-            ))
+            <div className="providers">
+              {providers.map((p) => (
+                <button
+                  key={p.info.uuid}
+                  onClick={() => connectWallet(p.provider)}
+                >
+                  <img src={p.info.icon} alt={p.info.name} />
+                  {p.info.name}
+                </button>
+              ))}
+            </div>
           )}
         </div>
       ) : (
         <div>
-          <p>Connected Account: {account}</p>
-          <p>Balance: {balance} XPLA </p>
+          <div className="connected-info">
+            <div>
+              <span className="label">Connected Account:</span>
+              <span className="value">{account}</span>
+            </div>
+            <div>
+              <span className="label">Balance:</span>
+              <span className="value">{balance} XPLA</span>
+            </div>
+          </div>
 
           <div>
             <label>{chainList.get(currentChain)!.name} ⮕ </label>
@@ -318,18 +333,18 @@ function App() {
               onChange={(e) => setTargetChain(e.target.value)}
             >
               {SUPPORTED_CHAINS.map((chain) => (
-                <option key={chain.value} value={chain.value}>{chain.label}</option>
+                <option key={chain.value} value={chain.value}>
+                  {chain.label}
+                </option>
               ))}
             </select>
             <input
-              size={50}
               type="text"
               placeholder="Recipient Address"
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
             />
             <input
-              size={15}
               type="number"
               placeholder="Amount"
               value={amount}
@@ -339,8 +354,25 @@ function App() {
             <button onClick={estimateSendOftTokens}>Estimate Fee</button>
             <button onClick={sendOftTokens}>Send Tokens</button>
           </div>
-          <p></p>
-          {txStatus && <textarea cols={80} rows={10} value={txStatus}></textarea>}
+
+          {txStatus && (
+            <div id="status">
+              {txStatus.split("\n").map((line, index) => (
+                <div key={index}>{line}</div>
+              ))}
+            </div>
+          )}
+
+          {txHash && (
+            <a
+              href={`https://testnet.layerzeroscan.com/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="explorer-link"
+            >
+              View on LayerZero Explorer (Tx: {txHash.slice(0, 6)}...{txHash.slice(-4)})
+            </a>
+          )}
         </div>
       )}
     </div>
