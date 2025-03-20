@@ -45,9 +45,9 @@ const SUPPORTED_CHAINS = [
 ]
 
 const chainList = new Map<string, LzChain>()
-chainList.set("0x2f", { name: "XPLA", eid: "40216", chainId: "0x2f", nativeToken: "XPLA", contractAddress: "0x2Bb21C18788587cbc3b8B903F5C8eAB9c7D26988" })
-chainList.set("0xaa36a7", { name: "ETHEREUM", eid: "40161", chainId: "0xaa36a7", nativeToken: "Eth", contractAddress: "0x2Bb21C18788587cbc3b8B903F5C8eAB9c7D26988" })
-chainList.set("0x61", { name: "BNB", eid: "40102", chainId: "0x61", nativeToken: "BNB", contractAddress: "0x2Bb21C18788587cbc3b8B903F5C8eAB9c7D26988" })
+chainList.set("0x2f", { name: "XPLA", eid: "40216", chainId: "0x2f", nativeToken: "XPLA", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
+chainList.set("0xaa36a7", { name: "ETHEREUM", eid: "40161", chainId: "0xaa36a7", nativeToken: "Eth", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
+chainList.set("0x61", { name: "BNB", eid: "40102", chainId: "0x61", nativeToken: "BNB", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
 
 type EstimatedInfo = {
   from: LzChain,
@@ -139,24 +139,24 @@ function App() {
         return
       }
 
-      const contract = await getOftContract(currentLzChain.contractAddress, provider);
-      const decimals = await contract.decimals();
-      const balance = await contract.balanceOf(account);
-      setBalance(ethers.formatUnits(balance, decimals));
+      const contract = await getOftContract(currentLzChain.contractAddress, provider)
+      const decimals = await contract.decimals()
+      const balance = await contract.balanceOf(account)
+      setBalance(ethers.formatUnits(balance, decimals))
     } catch (error) {
-      console.error("Failed to fetch balance:", error);
+      console.error("Failed to fetch balance:", error)
     }
   };
 
   // native fee 측정
   const estimateSendOftTokens = async () => {
     if (!provider || !account || !recipient || !amount || !targetChain) {
-      setTxStatus("Please fill in all fields and connect wallet");
+      setTxStatus("Please fill in all fields and connect wallet")
       return;
     }
 
     if (currentChain == targetChain) {
-      setTxStatus("Can't send between the same chains.");
+      setTxStatus("Can't send between the same chains.")
       return;
     }
 
@@ -167,7 +167,7 @@ function App() {
       const currentLzChain = chainList.get(currentChain)!
       const targetLzChain = chainList.get(targetChain)!
 
-      setTxStatus(`[${currentLzChain.name}] -> [${targetLzChain.name}] Processing...`);
+      setTxStatus(`[${currentLzChain.name}] -> [${targetLzChain.name}] Processing...`)
 
       const amountToSend = ethers.parseEther(amount)
 
@@ -189,7 +189,16 @@ function App() {
 
         const msgValue = estimatedNativeFee + amountToSend
 
-        setTxStatus(`Estimated native fee: ${ethers.formatEther(estimatedNativeFee.toString())} ${currentLzChain.nativeToken} \nTotal (native fee + amount): ${ethers.formatEther(msgValue.toString())} ${currentLzChain.nativeToken} `)
+
+        setTxStatus(`Estimated native fee: ${ethers.formatEther(estimatedNativeFee.toString())} ${currentLzChain.nativeToken} 
+        Total (native fee + amount): ${ethers.formatEther(msgValue.toString())} ${currentLzChain.nativeToken}`)
+
+        // Xpla에서 estimate 안되는 문제 있음.
+        // const estimatedGas = await contract.send.estimateGas(sendParam, [estimatedNativeFee, 0], recipient, { from: account, value: estimatedNativeFee })
+
+        // setTxStatus(`Estimated native fee: ${ethers.formatEther(estimatedNativeFee.toString())} ${currentLzChain.nativeToken} 
+        // Total (native fee + amount): ${ethers.formatEther(msgValue.toString())} ${currentLzChain.nativeToken}
+        // Estimated Gas: ${estimatedGas}`)
 
         // estimated 항목에 정보 추가
         setEstimatedInfo({ from: currentLzChain, to: targetLzChain, amount: amountToSend, nativeFee: estimatedNativeFee })
@@ -199,16 +208,19 @@ function App() {
         // Fetching the native fee for the token send operation
         const [estimatedNativeFee] = await contract.quoteSend(sendParam, false)
 
-        setTxStatus(`Estimated native fee: ${ethers.formatEther(estimatedNativeFee.toString())}  ${currentLzChain.nativeToken}`)
+        const estimatedGas = await contract.send.estimateGas(sendParam, [estimatedNativeFee, 0], recipient, { value: estimatedNativeFee })
+
+        setTxStatus(`Estimated native fee: ${ethers.formatEther(estimatedNativeFee.toString())} ${currentLzChain.nativeToken}
+        Estimated Gas: ${estimatedGas}`)
 
         // estimated 항목에 정보 추가
         setEstimatedInfo({ from: currentLzChain, to: targetLzChain, amount: amountToSend, nativeFee: estimatedNativeFee })
       }
     } catch (error: any) {
-      console.error("Transaction failed:", error);
-      setTxStatus(`Error: ${error.message}`);
+      console.error("Transaction failed:", error)
+      setTxStatus(`Error: ${error.message}`)
     }
-  };
+  }
 
   // Oft 전송
   const sendOftTokens = async () => {
@@ -235,12 +247,12 @@ function App() {
 
       // from, to, amount가 입력창의 값과 같은지 확인
       if (estimatedInfo.amount != amountToSend || estimatedInfo.from.chainId != currentLzChain.chainId || estimatedInfo.to != targetLzChain) {
-        setTxStatus("\nA change has been detected. Please estimate again. (Previous estimate values ​​have been reset.)");
+        setTxStatus("\nA change has been detected. Please estimate again. (Previous estimate values ​​have been reset.)")
         setEstimatedInfo(undefined)
         return
       }
 
-      setTxStatus(`[${currentLzChain.name}] -> [${targetLzChain.name}] Processing...`);
+      setTxStatus(`[${currentLzChain.name}] -> [${targetLzChain.name}] Processing...`)
 
       const sendParam = [
         targetLzChain.eid,
@@ -260,27 +272,27 @@ function App() {
 
         const receipt = await (await contract.send(sendParam, [estimatedInfo.nativeFee, 0], recipient, { value: msgValue })).wait()
 
-        setTxStatus(`Transaction successful! Tx Hash: ${receipt.hash}`);
+        setTxStatus(`Transaction successful! Tx Hash: ${receipt.hash}`)
         setTxHash(receipt.hash)
       } else {
-        const contract = await getOftContract(currentLzChain.contractAddress, provider);
+        const contract = await getOftContract(currentLzChain.contractAddress, provider)
         const nativeFee = estimatedInfo.nativeFee
 
         setTxStatus(`[${currentLzChain.name}] => [${targetLzChain.name}] Sending XPLA OFT... `)
 
-        const receipt = await (await contract.send(sendParam, [nativeFee, 0], recipient, { value: nativeFee })).wait();
+        const receipt = await (await contract.send(sendParam, [nativeFee, 0], recipient, { value: nativeFee })).wait()
 
-        setTxStatus(`Transaction successful! Tx Hash: ${receipt.hash}`);
+        setTxStatus(`Transaction successful! Tx Hash: ${receipt.hash}`)
         setTxHash(receipt.hash)
       }
 
-      setEstimatedInfo(undefined) // 초기화
-      fetchBalance(); // 잔액 갱신
+      setEstimatedInfo(undefined) 
+      fetchBalance() // 잔액 갱신
     } catch (error: any) {
-      console.error("Transaction failed:", error);
-      setTxStatus(`Error: ${error.message}`);
+      console.error("Transaction failed:", error)
+      setTxStatus(`Error: ${error.message}`)
     }
-  };
+  }
 
   // 계정 연결 시 잔액 조회
   useEffect(() => {
