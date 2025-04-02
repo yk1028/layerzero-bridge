@@ -26,28 +26,28 @@ type LzChain = {
 }
 
 // mainnet
-// const SUPPORTED_CHAINS = [
-//   {value: "0x25", label: "XPLA"},
-//   {value: "0x1", label: "ETHEREUM"},
-//   {value: "0x38", label: "BNB"}
-// ]
-// const chainList = new Map<string, lzChain>()
-// chainList.set("0x25", { name: "XPLA", eid: "30216", chainId: "0x25", nativeToken: "XPLA", contractAddress: "" })
-// chainList.set("0x1", { name: "ETHEREUM", eid: "30161", chainId: "0x1", nativeToken: "Eth", contractAddress: "" })
-// chainList.set("0x38", { name: "BNB", eid: "30102", chainId: "0x38", nativeToken: "BNB", contractAddress: "" })
-
-
-// testnet (value = chainid)
 const SUPPORTED_CHAINS = [
-  { value: "0x2f", label: "XPLA" },
-  { value: "0xaa36a7", label: "ETHEREUM" },
-  { value: "0x61", label: "BNB" }
+  {value: "0x25", label: "XPLA"},
+  {value: "0x1", label: "ETHEREUM"},
+  {value: "0x38", label: "BNB"}
 ]
-
 const chainList = new Map<string, LzChain>()
-chainList.set("0x2f", { name: "XPLA", eid: "40216", chainId: "0x2f", nativeToken: "XPLA", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
-chainList.set("0xaa36a7", { name: "ETHEREUM", eid: "40161", chainId: "0xaa36a7", nativeToken: "Eth", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
-chainList.set("0x61", { name: "BNB", eid: "40102", chainId: "0x61", nativeToken: "BNB", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
+chainList.set("0x25", { name: "XPLA", eid: "30216", chainId: "0x25", nativeToken: "XPLA", contractAddress: "0x332DD4F170cdfC27756EE4159E7DBF034c84C65b" })
+chainList.set("0x1", { name: "ETHEREUM", eid: "30101", chainId: "0x1", nativeToken: "Eth", contractAddress: "0x332DD4F170cdfC27756EE4159E7DBF034c84C65b" })
+chainList.set("0x38", { name: "BNB", eid: "30102", chainId: "0x38", nativeToken: "BNB", contractAddress: "0x332DD4F170cdfC27756EE4159E7DBF034c84C65b" })
+
+
+// // testnet (value = chainid)
+// const SUPPORTED_CHAINS = [
+//   { value: "0x2f", label: "XPLA" },
+//   { value: "0xaa36a7", label: "ETHEREUM" },
+//   { value: "0x61", label: "BNB" }
+// ]
+
+// const chainList = new Map<string, LzChain>()
+// chainList.set("0x2f", { name: "XPLA", eid: "40216", chainId: "0x2f", nativeToken: "XPLA", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
+// chainList.set("0xaa36a7", { name: "ETHEREUM", eid: "40161", chainId: "0xaa36a7", nativeToken: "Eth", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
+// chainList.set("0x61", { name: "BNB", eid: "40102", chainId: "0x61", nativeToken: "BNB", contractAddress: "0x2fa515603bC943c576DE404A044E1E4d3194bbB4" })
 
 type EstimatedInfo = {
   from: LzChain,
